@@ -12,11 +12,13 @@ CORS(app)  # Enable CORS for frontend-backend communication
 
 # Load the trained model and preprocessors
 try:
-    model = tf.keras.models.load_model("disease_classification_model.keras")
-    scaler = joblib.load("scaler.pkl")
-    label_encoder = joblib.load("label_encoder.pkl")
-    symptom_names = joblib.load("symptom_names.pkl")  # Load all 377 symptoms
-    num_features = len(symptom_names)  # Ensure we match model expectations
+    # Load the trained model and preprocessors
+model = tf.keras.models.load_model("backend/disease_classification_model.keras")
+scaler = joblib.load("backend/scaler.pkl")
+label_encoder = joblib.load("backend/label_encoder.pkl")
+symptom_names = joblib.load("backend/symptom_names.pkl")  # Load all 377 symptoms
+num_features = len(symptom_names)  # Ensure we match model expectations
+
 except Exception as e:
     print(f"Error loading model or preprocessing files: {e}")
     model, scaler, label_encoder, symptom_names = None, None, None, None
