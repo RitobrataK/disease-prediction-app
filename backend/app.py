@@ -4,6 +4,7 @@ import joblib
 import tensorflow as tf
 from flask_cors import CORS
 import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
 
 app = Flask(__name__, static_folder="../frontend/build")  # Serve React build files
 CORS(app)  # Enable CORS for frontend-backend communication
