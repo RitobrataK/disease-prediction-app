@@ -80,7 +80,7 @@ export default function SymptomSelector() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5001/")
+    fetch("https://disease-prediction-app-5h44.onrender.com")
       .then((response) => response.text())
       .then((data) => setBackendMessage(data))
       .catch((error) => console.error("Error fetching backend status:", error));
@@ -104,7 +104,7 @@ export default function SymptomSelector() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:5001/predict", {
+      const response = await fetch("https://disease-prediction-app-5h44.onrender.com/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
