@@ -6,19 +6,24 @@ from flask_cors import CORS
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
 
-app = Flask(__name__, static_folder="../frontend/build")  # Serve React build files
+
+app = Flask(__name__, static_folder="frontend/build")  # Serve React build files
 CORS(app)  # Enable CORS for frontend-backend communication
 
 # Load the trained model and preprocessors
-model = tf.keras.models.load_model("backend/disease_classification_model.keras")
-scaler = joblib.load("backend/scaler.pkl")
-label_encoder = joblib.load("backend/label_encoder.pkl")
-symptom_names = joblib.load("backend/symptom_names.pkl")  # Load all 377 symptoms
-
-num_features = len(symptom_names)  # Ensure we match model expectations
+try:
+    model = tf.keras.models.load_model("disease_classification_model.keras")
+    scaler = joblib.load("scaler.pkl")
+    label_encoder = joblib.load("label_encoder.pkl")
+    symptom_names = joblib.load("symptom_names.pkl")  # Load all 377 symptoms
+    num_features = len(symptom_names)  # Ensure we match model expectations
+except Exception as e:
+    print(f"Error loading model or preprocessing files: {e}")
+    model, scaler, label_encoder, symptom_names = None, None, None, None
 
 # Temporary fixes for predicted diseases
 temporary_fix = {
+    {
     "panic disorder": "Take slow, deep breaths. Try grounding techniques like the 5-4-3-2-1 method (name 5 things you see, 4 things you touch, etc.).",
     "vocal cord polyp": "Rest your voice as much as possible. Stay hydrated and avoid whispering, as it strains the vocal cords.",
     "turner syndrome": "Manage symptoms with hormone therapy if prescribed. Stay hydrated and eat a balanced diet to support overall health.",
@@ -794,17 +799,23 @@ temporary_fix = {
     "open wound of the nose": "Apply pressure and clean gently. Seek medical care if deep or bleeding persists."
 }
 
+}
+
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve(path):
-    if path != "" and os.path.exists(app.static_folder + "/" + path):
+    """ Serve React frontend """
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, "index.html")
+    return send_from_directory(app.static_folder, "index.html")
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    """ Handle disease prediction based on symptoms """
     try:
+        if model is None or scaler is None or label_encoder is None:
+            return jsonify({"error": "Model or pre-processing files not loaded"}), 500
+
         # Receive JSON input from frontend
         data = request.json
         input_symptoms = data.get("symptoms", [])
@@ -813,18 +824,18 @@ def predict():
             return jsonify({"error": "No symptoms provided"}), 400
 
         # Convert symptoms into a binary input vector of length 377
-        input_vector = np.zeros(num_features)  # Create full vector with 0s
+        input_vector = np.zeros(num_features)
 
         for symptom in input_symptoms:
             if symptom in symptom_names:
-                index = symptom_names.index(symptom)  # Get the correct index
+                index = symptom_names.index(symptom)
                 input_vector[index] = 1  # Mark symptom as present
 
         # Reshape input for model prediction
         input_vector = scaler.transform([input_vector])  # Normalize
         prediction = model.predict(np.array(input_vector))
 
-        # Get predicted disease (assuming classification model)
+        # Get predicted disease
         predicted_label = np.argmax(prediction)
         predicted_disease = label_encoder.inverse_transform([predicted_label])[0]
 
@@ -837,4 +848,5 @@ def predict():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render dynamically assigns a port
+    app.run(host="0.0.0.0", port=port)
