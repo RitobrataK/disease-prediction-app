@@ -4,21 +4,21 @@ import joblib
 import tensorflow as tf
 from flask_cors import CORS
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
 
+# Disable GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-app = Flask(__name__, static_folder="frontend/build")  # Serve React build files
+# Initialize Flask app
+app = Flask(__name__, static_folder="../frontend/build")  # Serve React build files
 CORS(app)  # Enable CORS for frontend-backend communication
 
 # Load the trained model and preprocessors
 try:
-    # Load the trained model and preprocessors
-model = tf.keras.models.load_model("backend/disease_classification_model.keras")
-scaler = joblib.load("backend/scaler.pkl")
-label_encoder = joblib.load("backend/label_encoder.pkl")
-symptom_names = joblib.load("backend/symptom_names.pkl")  # Load all 377 symptoms
-num_features = len(symptom_names)  # Ensure we match model expectations
-
+    model = tf.keras.models.load_model("backend/disease_classification_model.keras")
+    scaler = joblib.load("backend/scaler.pkl")
+    label_encoder = joblib.load("backend/label_encoder.pkl")
+    symptom_names = joblib.load("backend/symptom_names.pkl")  # Load all 377 symptoms
+    num_features = len(symptom_names)  # Ensure we match model expectations
 except Exception as e:
     print(f"Error loading model or preprocessing files: {e}")
     model, scaler, label_encoder, symptom_names = None, None, None, None
@@ -806,14 +806,14 @@ temporary_fix = {
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve(path):
-    """ Serve React frontend """
+    """Serve React frontend"""
     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
         return send_from_directory(app.static_folder, path)
     return send_from_directory(app.static_folder, "index.html")
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    """ Handle disease prediction based on symptoms """
+    """Handle disease prediction based on symptoms"""
     try:
         if model is None or scaler is None or label_encoder is None:
             return jsonify({"error": "Model or pre-processing files not loaded"}), 500
