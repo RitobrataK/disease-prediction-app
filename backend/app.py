@@ -10,7 +10,9 @@ from flask_cors import CORS
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="../frontend/dist")  # Serve React build files
-CORS(app)  # Enable CORS for frontend-backend communication
+CORS(app, origins=["https://disease-prediction-app-5h44.onrender.com"])  # Allow CORS for specific frontend origins
+
+
 
 # Load the trained model and preprocessors
 try:
