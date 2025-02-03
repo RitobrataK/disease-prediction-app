@@ -1,6 +1,5 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Disable GPU
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Suppress TensorFlow info and warning messages
 
 from flask import Flask, request, jsonify, send_from_directory
 import numpy as np
