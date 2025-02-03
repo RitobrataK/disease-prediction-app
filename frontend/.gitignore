@@ -10,10 +10,6 @@ lerna-debug.log*
 # Node modules
 node_modules
 
-# Build output
-dist
-dist-ssr
-
 # Vite Cache
 .vite
 
