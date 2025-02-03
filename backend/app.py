@@ -800,7 +800,14 @@ temporary_fix = {
     "conjunctivitis due to virus": "Use artificial tears and practice good hygiene to prevent spreading.",
     "open wound of the nose": "Apply pressure and clean gently. Seek medical care if deep or bleeding persists."
 }
-
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve(path):
+    """Serve React frontend"""
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, "index.html")
+    
 @app.route("/predict", methods=["POST"])
 def predict():
    try:
@@ -837,14 +844,6 @@ def predict():
 @app.route("/test")
 def test():
     return "Backend is running!"
-
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve(path):
-    """Serve React frontend"""
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, "index.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))  # Render dynamically assigns a port
