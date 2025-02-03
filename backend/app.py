@@ -803,11 +803,7 @@ temporary_fix = {
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    """Handle disease prediction based on symptoms"""
-    try:
-        if model is None or scaler is None or label_encoder is None:
-            return jsonify({"error": "Model or pre-processing files not loaded"}), 500
-
+   try:
         # Receive JSON input from frontend
         data = request.json
         input_symptoms = data.get("symptoms", [])
@@ -816,18 +812,18 @@ def predict():
             return jsonify({"error": "No symptoms provided"}), 400
 
         # Convert symptoms into a binary input vector of length 377
-        input_vector = np.zeros(num_features)
+        input_vector = np.zeros(num_features)  # Create full vector with 0s
 
         for symptom in input_symptoms:
             if symptom in symptom_names:
-                index = symptom_names.index(symptom)
+                index = symptom_names.index(symptom)  # Get the correct index
                 input_vector[index] = 1  # Mark symptom as present
 
         # Reshape input for model prediction
         input_vector = scaler.transform([input_vector])  # Normalize
         prediction = model.predict(np.array(input_vector))
 
-        # Get predicted disease
+        # Get predicted disease (assuming classification model)
         predicted_label = np.argmax(prediction)
         predicted_disease = label_encoder.inverse_transform([predicted_label])[0]
 
