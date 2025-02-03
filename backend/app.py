@@ -23,7 +23,6 @@ except Exception as e:
 
 # Temporary fixes for predicted diseases
 temporary_fix = {
-    {
     "panic disorder": "Take slow, deep breaths. Try grounding techniques like the 5-4-3-2-1 method (name 5 things you see, 4 things you touch, etc.).",
     "vocal cord polyp": "Rest your voice as much as possible. Stay hydrated and avoid whispering, as it strains the vocal cords.",
     "turner syndrome": "Manage symptoms with hormone therapy if prescribed. Stay hydrated and eat a balanced diet to support overall health.",
@@ -797,8 +796,6 @@ temporary_fix = {
     "pseudotumor cerebri": "Seek medical evaluation for symptom management and possible treatments.",
     "conjunctivitis due to virus": "Use artificial tears and practice good hygiene to prevent spreading.",
     "open wound of the nose": "Apply pressure and clean gently. Seek medical care if deep or bleeding persists."
-}
-
 }
 
 @app.route("/", defaults={"path": ""})
