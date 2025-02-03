@@ -838,6 +838,9 @@ def predict():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@app.route("/test")
+def test():
+    return "Backend is running!"
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
