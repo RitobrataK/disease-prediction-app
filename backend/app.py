@@ -801,14 +801,6 @@ temporary_fix = {
     "open wound of the nose": "Apply pressure and clean gently. Seek medical care if deep or bleeding persists."
 }
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve(path):
-    """Serve React frontend"""
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    return send_from_directory(app.static_folder, "index.html")
-
 @app.route("/predict", methods=["POST"])
 def predict():
     """Handle disease prediction based on symptoms"""
@@ -846,6 +838,14 @@ def predict():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve(path):
+    """Serve React frontend"""
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    return send_from_directory(app.static_folder, "index.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render dynamically assigns a port
