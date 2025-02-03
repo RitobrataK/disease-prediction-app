@@ -9,7 +9,7 @@ from flask_cors import CORS
 
 # Initialize Flask app
 app = Flask(__name__, static_folder="../frontend/dist")  # Serve React build files
-CORS(app, origins=["https://disease-prediction-app-5h44.onrender.com"])  # Allow CORS for specific frontend origins
+CORS(app)  # Allow CORS for specific frontend origins
 
 
 
