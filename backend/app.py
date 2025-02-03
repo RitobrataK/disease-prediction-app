@@ -810,36 +810,52 @@ def serve(path):
     
 @app.route("/predict", methods=["POST"])
 def predict():
-   try:
+    try:
+        print("Received request...")  # Check if function is called
+
         # Receive JSON input from frontend
         data = request.json
+        print("Received data:", data)  # Print the received JSON
+
         input_symptoms = data.get("symptoms", [])
+        print("Input symptoms:", input_symptoms)  # Check if symptoms are received
 
         if not input_symptoms:
             return jsonify({"error": "No symptoms provided"}), 400
 
         # Convert symptoms into a binary input vector of length 377
         input_vector = np.zeros(num_features)  # Create full vector with 0s
+        print("Created input vector:", input_vector.shape)  # Check vector shape
 
         for symptom in input_symptoms:
             if symptom in symptom_names:
                 index = symptom_names.index(symptom)  # Get the correct index
                 input_vector[index] = 1  # Mark symptom as present
 
+        print("Final input vector before scaling:", input_vector)  # Print input before scaling
+
         # Reshape input for model prediction
         input_vector = scaler.transform([input_vector])  # Normalize
+        print("Scaled input vector:", input_vector)  # Check scaled input
+
         prediction = model.predict(np.array(input_vector))
+        print("Raw model prediction:", prediction)  # Check model output
 
         # Get predicted disease (assuming classification model)
         predicted_label = np.argmax(prediction)
+        print("Predicted label:", predicted_label)  # Check predicted class
+
         predicted_disease = label_encoder.inverse_transform([predicted_label])[0]
+        print("Predicted disease:", predicted_disease)  # Check disease name
 
         # Get the temporary fix if available
         fix = temporary_fix.get(predicted_disease, "No temporary fix available. Please consult a doctor.")
+        print("Temporary fix:", fix)  # Check fix message
 
         return jsonify({"predicted_disease": predicted_disease, "temporary_fix": fix})
 
     except Exception as e:
+        print("Error occurred:", str(e))  # Print error in logs
         return jsonify({"error": str(e)}), 500
 @app.route("/test")
 def test():
